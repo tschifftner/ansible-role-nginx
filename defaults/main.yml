@@ -1,0 +1,9 @@
+---
+nginx_package: nginx-full
+nginx_owner: www-data
+nginx_group: www-data
+worker_processes: 4
+
+# GeoIP
+install_geoip: true
+geoip_download_url: "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"

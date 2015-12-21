@@ -1,0 +1,24 @@
+# GeoIP
+- name: Make sure /usr/share/GeoIP is present
+  file: path=/usr/share/GeoIP state=directory owner={{ nginx_owner }} group={{ nginx_group }} mode=0755
+
+- name: Download GeoIP.dat.gz
+  get_url: url={{ geoip_download_url }} dest=/usr/share/GeoIP/GeoIP.dat.gz
+  register: new_archive
+
+- name: Install unzip if missing
+  apt: name=unzip state=present
+  sudo: yes
+  when: new_archive|changed
+
+- name: Unarchiv
+  command: /bin/gunzip --force /usr/share/GeoIP/GeoIP.dat.gz
+  ignore_errors: true
+  when: new_archive|changed
+
+- name: GetIP.dat is present
+  file: path=/usr/share/GeoIP/GeoIP.dat state=file
+
+- name: Configure nginx
+  template: src=conf.d/geoip.conf dest=/etc/nginx/conf.d/ owner={{ nginx_owner }} group={{ nginx_group }} mode=0644
+  notify: restart nginx

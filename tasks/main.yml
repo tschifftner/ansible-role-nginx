@@ -1,0 +1,7 @@
+
+- name: Install nginx
+  include: nginx.yml
+
+- name: Install GeoIP
+  include: geoip.yml
+  when: install_geoip
