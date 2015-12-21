@@ -9,19 +9,19 @@
 
 # Configure nginx
 - name: Make sure folders are present
-  file: path={{ item }} state=directory
+  file: path={{ item }} state=directory owner=root group=root mode=0755
   with_items:
-    - /etc/nginx/
-    - /etc/nginx/conf.d/
+    - /etc/nginx
+    - /etc/nginx/conf.d
 
 - name: Copy main configurations
-  template: src={{ item }} dest=/etc/nginx/ owner={{ nginx_owner }} group={{ nginx_group }} mode=0644
+  template: src={{ item }} dest=/etc/nginx/{{ item }} owner=root group=root mode=0644
   notify: restart nginx
   with_items:
     - nginx.conf
 
 - name: Copy conf.d/ configurations
-  template: src=conf.d/{{ item }} dest=/etc/nginx/conf.d/ owner={{ nginx_owner }} group={{ nginx_group }} mode=0644
+  template: src=conf.d/{{ item }} dest=/etc/nginx/conf.d/{{ item }} owner=root group=root mode=0644
   notify: restart nginx
   with_items:
     - cache.conf
@@ -30,3 +30,4 @@
     - logging.conf
     - mail.conf
     - ssl.conf
+

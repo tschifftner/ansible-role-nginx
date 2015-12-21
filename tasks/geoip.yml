@@ -12,7 +12,7 @@
   when: new_archive|changed
 
 - name: Unarchiv
-  command: /bin/gunzip --force /usr/share/GeoIP/GeoIP.dat.gz
+  command: /bin/gunzip --force -c /usr/share/GeoIP/GeoIP.dat /usr/share/GeoIP/GeoIP.dat.gz
   ignore_errors: true
   when: new_archive|changed
 
@@ -20,5 +20,5 @@
   file: path=/usr/share/GeoIP/GeoIP.dat state=file
 
 - name: Configure nginx
-  template: src=conf.d/geoip.conf dest=/etc/nginx/conf.d/ owner={{ nginx_owner }} group={{ nginx_group }} mode=0644
+  template: src=conf.d/geoip.conf dest=/etc/nginx/conf.d/geoip.conf owner={{ nginx_owner }} group={{ nginx_group }} mode=0644
   notify: restart nginx
