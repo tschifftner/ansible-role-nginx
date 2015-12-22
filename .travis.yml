@@ -16,6 +16,9 @@ install:
   # Add ansible.cfg to pick up roles path.
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
+  # Install ansible-lint
+  - pip install ansible-lint
+
 script:
   # Check the role/playbook's syntax.
   - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
@@ -29,6 +32,9 @@ script:
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
+
+  # ansible-lint checks for best practice
+  - ansible-lint tests/$SITE
 
   # Check if nginx is reachable
   - curl http://127.0.0.1/
