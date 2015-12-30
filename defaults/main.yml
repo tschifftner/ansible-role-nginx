@@ -7,3 +7,6 @@ worker_processes: 4
 # GeoIP
 install_geoip: true
 geoip_download_url: "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+
+# use to add template files into nginx folders like conf.d/custom.conf
+nginx_config_files: []

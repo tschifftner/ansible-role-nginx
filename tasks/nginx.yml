@@ -1,33 +1,23 @@
 
 # Install nginx
 - name: Install nginx
-  action: apt name={{ item }} state=present
+  apt: name={{ item }} state=present
   with_items: nginx_package
 
 - name: Verify nginx service
-  action: service name=nginx state=started
+  service: name=nginx state=started
 
 # Configure nginx
 - name: Make sure folders are present
   file: path={{ item }} state=directory owner=root group=root mode=0755
-  with_items:
-    - /etc/nginx
-    - /etc/nginx/conf.d
+  with_items: nginx_folders_required
 
 - name: Copy main configurations
-  template: src={{ item }} dest=/etc/nginx/{{ item }} owner=root group=root mode=0644
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
   notify: restart nginx
-  with_items:
-    - nginx.conf
-
-- name: Copy conf.d/ configurations
-  template: src=conf.d/{{ item }} dest=/etc/nginx/conf.d/{{ item }} owner=root group=root mode=0644
-  notify: restart nginx
-  with_items:
-    - cache.conf
-    - fastcgi.conf
-    - gzip.conf
-    - logging.conf
-    - mail.conf
-    - ssl.conf
-
+  with_items: "{{ nginx_default_config_files + nginx_config_files }}"

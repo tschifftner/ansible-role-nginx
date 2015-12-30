@@ -1,0 +1,13 @@
+---
+nginx_default_config_files:
+  - nginx.conf
+  - conf.d/cache.conf
+  - conf.d/fastcgi.conf
+  - conf.d/gzip.conf
+  - conf.d/logging.conf
+  - conf.d/mail.conf
+  - conf.d/ssl.conf
+
+nginx_folders_required:
+  - /etc/nginx
+  - /etc/nginx/conf.d

@@ -3,7 +3,7 @@
   remote_user: root
 
   vars:
-    install_geoip: false
+    install_geoip: true
 
   roles:
     - ansible-role-nginx
