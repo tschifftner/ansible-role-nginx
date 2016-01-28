@@ -1,0 +1,26 @@
+
+# Install nginx
+- name: Install nginx
+  apt:
+    name: '{{ nginx_package }}'
+    state: '{{ nginx_package_state }}'
+
+# Configure nginx
+- name: Make sure folders are present
+  file:
+    path: '/etc/nginx/{{ item | dirname }}'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items: "{{ nginx_default_config_files + nginx_config_files }}"
+
+- name: Copy main configurations
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx
+  with_items: "{{ nginx_default_config_files + nginx_config_files }}"

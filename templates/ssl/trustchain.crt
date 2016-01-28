@@ -1,0 +1,3 @@
+{{ item.root_certificate }}
+
+{{ item.intermediate_certificate }}

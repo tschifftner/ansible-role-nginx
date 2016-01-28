@@ -1,0 +1,44 @@
+---
+- name: Ensure ssl save paths exist
+  no_log: true
+  file:
+    path: '{{ item.save_path }}'
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0440'
+  when: item.save_path is defined
+  with_items: nginx_ssl_certificates
+
+- name: Generate trustchain.crt
+  no_log: true
+  template:
+    src: 'ssl/trustchain.crt'
+    dest: '{{ item.save_path }}/trustchain.crt'
+  when: item.root_certificate is defined and item.intermediate_certificate is defined
+  with_items: nginx_ssl_certificates
+
+- name: Generate certificate.key
+  no_log: true
+  template:
+    src: 'ssl/certificate.key'
+    dest: '{{ item.save_path }}/certificate.key'
+  when: item.certificate_key is defined
+  with_items: nginx_ssl_certificates
+
+- name: Generate certificate.crt
+  no_log: true
+  template:
+    src: 'ssl/certificate.crt'
+    dest: '{{ item.save_path }}/certificate.crt'
+  when: item.certificate is defined and item.intermediate_certificate is defined
+  with_items: nginx_ssl_certificates
+
+#- name: Generate dhparam.pem for every ssl certificate
+#  no_log: true
+#  notify: reload nginx
+#  shell: openssl dhparam 2048 -out {{ item.save_path }}/dhparam.pem
+#  args:
+#    creates: '{{ item.save_path }}/dhparam.pem'
+#  async: 120
+#  with_items: nginx_ssl_certificates

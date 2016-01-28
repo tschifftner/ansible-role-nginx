@@ -1,0 +1,80 @@
+---
+
+- name: Ensure default vhost is removed
+  notify: reload nginx
+  file:
+    path: '/etc/nginx/sites-enabled/default'
+    state: absent
+  when: nginx_remove_default_vhost
+
+#- name: Ensure all project paths exist
+#  file:
+#    path: '{{ item.file | dirname }}'
+#    state: directory
+#  with_items: nginx_vhosts
+
+- name: 'Get enabled sites'
+  shell: ls -1 /etc/nginx/sites-enabled/
+  register: sites_enabled
+  changed_when: false
+
+- set_fact:
+    all_vhosts: "{{ (nginx_vhosts.keys() if nginx_vhosts is mapping else [] | list)  + ['default'] }}"
+
+- debug: msg="{{ all_vhosts }}"
+
+- name: Remove leftover servers
+  file:
+    path: /etc/nginx/sites-enabled/{{ item }}
+    state: absent
+  when: item not in all_vhosts
+  with_items: sites_enabled.stdout_lines
+
+- name: Generate nginx vhosts
+  notify: reload nginx
+  template:
+    src: 'vhost.conf'
+    dest: '/etc/nginx/sites-enabled/{{ item }}'
+    owner: root
+    group: www-data
+    mode: '0644'
+  with_items: nginx_vhosts
+
+- name: Install additional templates
+  notify: reload nginx
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  when: item.src is defined and item.dest is defined
+  with_items: nginx_additional_templates
+
+
+#- name: Ensure vhost are accessible
+#  file:
+#    path: '/var/www'
+#    directory:
+#    mode: '+rx'
+#    recurse: true
+
+#- name: Link all custom path nginx.conf files
+#  notify: reload nginx
+#  file:
+#    src: '{{ item.file }}'
+#    dest: '/etc/nginx/sites-enabled/{{ item.enable_as if item.enable_as is defined else item.file | basename }}'
+#    state: link
+#  when: "{{ item.file | dirname != '/etc/nginx/sites-enabled' }}"
+#  with_items: nginx_vhosts
+
+#- name: Add project user group nginx user
+#  user:
+#    name: '{{ nginx_owner }}'
+#    append: true
+#    groups: '{{ project_user }}'
+#
+#- name: Enable host
+#  notify: reload nginx
+#  file:
+#    src: '{{ project_config_path }}/nginx.conf'
+#    dest: '/etc/nginx/sites-enabled/{{ project }}'
+#    state: link
+#  when: servers is defined

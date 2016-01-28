@@ -1,0 +1,17 @@
+---
+
+- name: Ensure directory exists
+  file:
+    path: '{{ nginx_dhparam_file | dirname }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Generate dhparam.pem
+  notify: reload nginx
+  shell: openssl dhparam 2048 -out {{ nginx_dhparam_file }}
+  args:
+    creates: '{{ nginx_dhparam_file }}'
+  async: 600
+  poll: 5

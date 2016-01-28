@@ -1,0 +1,7 @@
+{{ item.certificate }}
+
+{{ item.intermediate_certificate }}
+
+{% if item.intermediate_certificate2 is defined %}
+{{ item.intermediate_certificate2 }}
+{% endif %}

@@ -6,7 +6,7 @@ Installs nginx on Debian/Ubuntu linux servers.
 
 ## Requirements
 
-None.
+ansible 2.0+
 
 ## Role Variables
 

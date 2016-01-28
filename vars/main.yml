@@ -7,7 +7,15 @@ nginx_default_config_files:
   - conf.d/logging.conf
   - conf.d/mail.conf
   - conf.d/ssl.conf
+  - conf.d/upstreams.conf
 
 nginx_folders_required:
   - /etc/nginx
   - /etc/nginx/conf.d
+
+
+#fail2ban_dependent_jails:
+#  <<: ['{{ nginx_fail2ban_jails }}']
+#
+
+#"{{ fail2ban_dependent_jails|list + nginx_fail2ban_jails|list }}"

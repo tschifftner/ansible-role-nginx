@@ -1,12 +1,93 @@
 ---
 nginx_package: nginx-full
+nginx_package_state: 'latest'
+
 nginx_owner: www-data
 nginx_group: www-data
-worker_processes: 4
+nginx_worker_processes: '{{ ansible_processor_cores * ansible_processor_count }}'
+nginx_worker_connections: '{{ 768 if ansible_processor_count == 1 else 2048 }}'
+nginx_pid_file: '/run/nginx.pid'
+nginx_multi_accept: 'on'
+
+nginx_remove_default_vhost: true
 
 # GeoIP
-install_geoip: true
+install_geoip: false
 geoip_download_url: "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+
+nginx_extra_http_options: []
 
 # use to add template files into nginx folders like conf.d/custom.conf
 nginx_config_files: []
+
+nginx_vhosts: []
+
+nginx_upstreams: []
+#  - name: 'varnish'
+#    servers:
+#      - 'localhost:6081'
+#      - 'localhost:8080 backup'
+
+nginx_dhparam_file: '/etc/nginx/ssl/dhparam.pem'
+
+
+#
+# HTTP servers
+#
+nginx_fail2ban_jails:
+
+  - name: 'nginx-http-auth'
+    enabled: true
+    port:
+      - http
+      - https
+    filter: nginx-http-auth
+    logpath: /var/log/nginx/error.log
+    maxretry: 3
+
+  - name: 'nginx-noscript'
+    enabled: true
+    port:
+      - http
+      - https
+    filter: nginx-noscript
+    logpath: /var/log/nginx/access.log
+    maxretry: 6
+
+  - name: 'nginx-nohome'
+    enabled: true
+    port:
+      - http
+      - https
+    filter: nginx-nohome
+    logpath: /var/log/nginx/access.log
+    maxretry: 2
+
+  - name: 'nginx-noproxy'
+    enabled: true
+    port:
+      - http
+      - https
+    filter: nginx-noproxy
+    logpath: /var/log/nginx/access.log
+    maxretry: 2
+    bantime: -1
+
+  - name: 'nginx-badbots'
+    enabled: true
+    filter: nginx-badbots
+    action: iptables-multiport-log[name=BadBots, port="80"] sendmail-whois-lines[name=BadBots, lines=5, dest=abuse@example.com]
+    logpath: /var/log/nginx/*access.log
+    bantime: -1
+    findtime: 360
+    maxretry: 1
+
+  - name: 'nginx-req-limit'
+    enabled: false
+    filter: nginx-req-limit
+    action: iptables-multiport[name=ReqLimit, port="http,https", protocol=tcp]
+    logpath: /var/log/nginx/*error.log
+    findtime: 600
+    bantime: 7200
+    maxretry: 10
+

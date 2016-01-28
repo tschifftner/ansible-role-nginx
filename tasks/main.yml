@@ -1,7 +1,23 @@
+---
 
 - name: Install nginx
-  include: nginx.yml
+  include: install.yml
 
 - name: Install GeoIP
   include: geoip.yml
   when: install_geoip
+
+- name: Install ssl certificates
+  include: ssl.yml
+
+- name: Generate dhparam.pem
+  include: dhparam.yml
+
+- name: Configure vhosts
+  include: vhosts.yml
+
+- name: Start nginx
+  service:
+    name: 'nginx'
+    state: started
+    enabled: yes
