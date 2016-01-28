@@ -5,9 +5,11 @@ python: "2.7"
 env:
   - SITE=test.yml ANSIBLE_VERSION=1.8
   - SITE=test.yml ANSIBLE_VERSION=1.9.4
+  - SITE=test.yml ANSIBLE_VERSION=2.0.0.2
 
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.8
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.9.4
+  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
 
 before_install:
   - sudo apt-get update -qq
@@ -42,3 +44,10 @@ script:
 
   # Check if nginx is reachable
   - curl http://127.0.0.1/
+
+after_failure:
+  - sudo service nginx status
+  - ansible --version
+
+notifications:
+  slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
