@@ -2,19 +2,24 @@
 
 - name: Install nginx
   include: install.yml
+  tags: ['nginx-install']
 
 - name: Install GeoIP
   include: geoip.yml
   when: install_geoip
+  tags: ['nginx-geoip']
 
 - name: Install ssl certificates
   include: ssl.yml
+  tags: ['nginx-ssl']
 
 - name: Generate dhparam.pem
   include: dhparam.yml
+  tags: ['nginx-dhparam']
 
 - name: Configure vhosts
   include: vhosts.yml
+  tags: ['nginx-vhosts']
 
 - name: Start nginx
   service:

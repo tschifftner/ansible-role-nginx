@@ -14,31 +14,39 @@
 #  with_items: nginx_vhosts
 
 - name: 'Get enabled sites'
-  shell: ls -1 /etc/nginx/sites-enabled/
+  shell: ls -1 /etc/nginx/sites-enabled/* | grep 'vhost.'
   register: sites_enabled
   changed_when: false
+  ignore_errors: true
 
 - set_fact:
-    all_vhosts: "{{ (nginx_vhosts.keys() if nginx_vhosts is mapping else [] | list)  + ['default'] }}"
+    vhosts: "{{ (nginx_vhosts.keys() if nginx_vhosts is mapping else [] | list) }}"
 
-- debug: msg="{{ all_vhosts }}"
+- debug: msg="{{ vhosts }}"
 
 - name: Remove leftover servers
   file:
     path: /etc/nginx/sites-enabled/{{ item }}
     state: absent
-  when: item not in all_vhosts
+  when: item not in vhosts
   with_items: sites_enabled.stdout_lines
 
 - name: Generate nginx vhosts
   notify: reload nginx
   template:
     src: 'vhost.conf'
-    dest: '/etc/nginx/sites-enabled/{{ item }}'
+    dest: '/etc/nginx/sites-enabled/vhost.{{ item }}'
     owner: root
     group: www-data
     mode: '0644'
   with_items: nginx_vhosts
+
+- name: Ensure config path exist
+  file:
+    path: '{{ item.dest | dirname }}'
+    state: directory
+  when: item.src is defined and item.dest is defined
+  with_items: nginx_additional_templates
 
 - name: Install additional templates
   notify: reload nginx

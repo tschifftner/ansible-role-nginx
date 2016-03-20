@@ -5,11 +5,11 @@ python: "2.7"
 env:
   - SITE=test.yml ANSIBLE_VERSION=1.8
   - SITE=test.yml ANSIBLE_VERSION=1.9.4
-  - SITE=test.yml ANSIBLE_VERSION=2.0.0.2
+  - SITE=test.yml ANSIBLE_VERSION=2.0.1.0
 
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.8
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.9.4
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
+  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.1.0
 
 before_install:
   - sudo apt-get update -qq
