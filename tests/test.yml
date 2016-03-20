@@ -3,6 +3,7 @@
   remote_user: root
 
   vars:
+    nginx_remove_default_vhost: false
     install_geoip: false
 
   roles:
