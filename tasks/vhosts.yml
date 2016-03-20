@@ -26,10 +26,10 @@
 
 - name: Remove leftover servers
   file:
-    path: /etc/nginx/sites-enabled/{{ item }}
+    path: '/etc/nginx/sites-enabled/{{ item }}'
     state: absent
   when: item not in vhosts
-  with_items: sites_enabled.stdout_lines
+  with_items: '{{ sites_enabled.stdout_lines }}'
 
 - name: Generate nginx vhosts
   notify: reload nginx
@@ -39,7 +39,7 @@
     owner: root
     group: www-data
     mode: '0644'
-  with_items: nginx_vhosts
+  with_items: '{{ nginx_vhosts }}'
 
 - name: Ensure config path exist
   file:

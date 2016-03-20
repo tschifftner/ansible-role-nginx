@@ -48,6 +48,8 @@ script:
 after_failure:
   - sudo service nginx status
   - ansible --version
+  - curl http://127.0.0.1/
+  - curl http://localhost/
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
