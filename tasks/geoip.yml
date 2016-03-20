@@ -1,4 +1,11 @@
+---
 # GeoIP
+
+- name: GeoIP.dat is present
+  register: nginx_geoip_present
+  stat:
+    path: /usr/share/GeoIP/GeoIP.dat
+
 - name: Make sure /usr/share/GeoIP is present
   file:
     path: '/usr/share/GeoIP'
@@ -7,37 +14,42 @@
     group: '{{ nginx_group }}'
     mode: '0755'
 
-- name: Download GeoIP.dat.gz
-  get_url:
-    url: '{{ geoip_download_url }}'
-    dest: '/usr/share/GeoIP/GeoIP.dat.gz'
-  register: new_archive
-
 - name: Install unzip if missing
   apt:
     name: unzip
     state: present
 
+- name: Download GeoIP.dat.gz
+  get_url:
+    url: '{{ geoip_download_url }}'
+    dest: '/usr/share/GeoIP/GeoIP.dat.gz'
+  register: new_archive
+  when: nginx_geoip_present.stat.exists == false
+
 - name: Unarchiv
   command: /bin/gunzip --force /usr/share/GeoIP/GeoIP.dat.gz > /usr/share/GeoIP/GeoIP.dat
+  args:
+    creates: /usr/share/GeoIP/GeoIP.dat
   ignore_errors: true
-  when: new_archive|changed
+  when: nginx_geoip_present.stat.exists == false
 
-# Prepared for ansible 2.0, but unarchiv fails for .gz files
 #- name: Unarchiv
 #  unarchive:
-#    src: '{{ geoip_download_url }}'
+#    src: '/usr/share/GeoIP/GeoIP.dat.gz'
+##    src: '{{ geoip_download_url }}' # Prepared for ansible 2.0, but unarchiv fails for .gz files
 #    dest: '/usr/share/GeoIP/'
 #    owner: '{{ nginx_owner }}'
 #    group: '{{ nginx_owner }}'
 #    mode: '755'
 #    copy: no
 #    creates: '/usr/share/GeoIP/GeoIP.dat'
+#  when: nginx_geoip_present.stat.exists == false
 
 - name: GeoIP.dat is present
   file:
     path: /usr/share/GeoIP/GeoIP.dat
     state: file
+  when: nginx_geoip_present.stat.exists == false
 
 - name: Configure nginx
   template:
