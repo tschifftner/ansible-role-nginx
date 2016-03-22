@@ -1,5 +1,10 @@
 ---
 
+- name: Check if file exists
+  stat:
+    path: '{{ nginx_dhparam_file }}'
+  register: _nginx_dhparam_file
+
 - name: Ensure directory exists
   file:
     path: '{{ nginx_dhparam_file | dirname }}'
@@ -7,6 +12,7 @@
     owner: root
     group: root
     mode: '0755'
+  when: not _nginx_dhparam_file.stat.exists
 
 - name: Generate dhparam.pem
   notify: reload nginx
@@ -15,3 +21,4 @@
     creates: '{{ nginx_dhparam_file }}'
   async: 600
   poll: 5
+  when: not _nginx_dhparam_file.stat.exists
