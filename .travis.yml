@@ -1,4 +1,7 @@
 ---
+sudo: required
+dist: trusty
+
 language: python
 python: "2.7"
 
@@ -41,6 +44,10 @@ env:
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.7.1
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.7
 
+branches:
+  only:
+    - master
+
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y curl
@@ -57,10 +64,10 @@ install:
 
 script:
   # Check the role/playbook's syntax.
-  - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
+  - ansible-playbook -i tests/inventory tests/test.yml --syntax-check
 
   # Run the role/playbook with ansible-playbook.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
+  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
 
   # Run the role/playbook again, checking to make sure it's idempotent.
   - >
@@ -83,3 +90,4 @@ after_failure:
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
