@@ -44,6 +44,15 @@ env:
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.7.1
   - SITE=test-geoip.yml ANSIBLE_VERSION=1.7
 
+matrix:
+  allow_failures:
+    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.2
+    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.1
+    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.0
+    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
+    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.1
+    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.0
+
 branches:
   only:
     - master
