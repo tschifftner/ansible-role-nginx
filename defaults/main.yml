@@ -30,6 +30,8 @@ nginx_upstreams: []
 
 nginx_dhparam_file: '/etc/nginx/ssl/dhparam.pem'
 
+nginx_ssl_certificates: []
+nginx_additional_templates: []
 
 #
 # HTTP servers
