@@ -19,10 +19,12 @@
   changed_when: false
   ignore_errors: true
 
-- set_fact:
+- name: 'Collect vhosts'
+  set_fact:
     vhosts: "{{ (nginx_vhosts.keys() if nginx_vhosts is mapping else [] | list) }}"
 
-- debug: msg="{{ vhosts }}"
+- name: 'Output vhosts variable'
+  debug: msg="{{ vhosts }}"
 
 - name: Remove leftover servers
   file:
@@ -46,7 +48,7 @@
     path: '{{ item.dest | dirname }}'
     state: directory
   when: item.src is defined and item.dest is defined
-  with_items: nginx_additional_templates
+  with_items: '{{nginx_additional_templates}}'
 
 - name: Install additional templates
   notify: reload nginx
@@ -54,7 +56,7 @@
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
   when: item.src is defined and item.dest is defined
-  with_items: nginx_additional_templates
+  with_items: '{{nginx_additional_templates}}'
 
 
 #- name: Ensure vhost are accessible
