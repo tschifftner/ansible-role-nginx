@@ -41,4 +41,4 @@
 #  args:
 #    creates: '{{ item.save_path }}/dhparam.pem'
 #  async: 120
-#  with_items: '{{nginx_ssl_certificates}}'
+#  with_items: nginx_ssl_certificates
