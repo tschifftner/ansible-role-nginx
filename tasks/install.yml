@@ -1,4 +1,17 @@
 
+- name: Add keys
+  apt_key:
+    url: 'http://nginx.org/keys/nginx_signing.key'
+    state: present
+
+- name: Add repositories
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: nginx
+  with_items: '{{ nginx_repository_urls }}'
+
+
 # Install nginx
 - name: Install nginx
   apt:
