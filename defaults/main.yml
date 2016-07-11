@@ -1,7 +1,7 @@
 ---
 nginx_repository_urls:
-  - 'deb http://nginx.org/packages/mainline/debian/ {{ ansible_distribution_release }} nginx'
-  - 'deb-src http://nginx.org/packages/mainline/debian/ {{ ansible_distribution_release }} nginx'
+  - 'deb http://nginx.org/packages/mainline/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} nginx'
+  - 'deb-src http://nginx.org/packages/mainline/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} nginx'
 
 nginx_package: nginx-full
 nginx_package_state: 'latest'
