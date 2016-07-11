@@ -74,7 +74,8 @@ after_failure:
   - ansible --version
   - curl http://127.0.0.1/
   - curl http://localhost/
-
+  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
