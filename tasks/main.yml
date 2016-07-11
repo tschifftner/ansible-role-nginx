@@ -1,5 +1,19 @@
 ---
 
+- name: 'Get current nginx version'
+  shell: nginx -v 2>&1 | awk -F/ '{print $2}'
+  register: nginx_current_version_output
+  changed_when: false
+  ignore_errors: true
+
+- name: Set proper nginx version
+  set_fact:
+    nginx_current_version: "{{ nginx_current_version_output.stdout | default('0.0.0') }}"
+
+- name: show version
+  debug:
+    msg: '{{ nginx_current_version }}'
+
 - name: Install nginx
   include: install.yml
   tags: ['nginx-install']
