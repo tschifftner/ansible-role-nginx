@@ -40,3 +40,4 @@
     name: 'nginx'
     state: started
     enabled: yes
+  changed_when: false # fix idempotence
