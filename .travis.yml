@@ -8,28 +8,18 @@ python: "2.7"
 env:
   - SITE=test.yml ANSIBLE_VERSION=latest
   - SITE=test.yml ANSIBLE_VERSION=2.1.0.0
-  - SITE=test.yml ANSIBLE_VERSION=2.0.2.0
-  - SITE=test.yml ANSIBLE_VERSION=2.0.1.0
-  - SITE=test.yml ANSIBLE_VERSION=2.0.0.2
-  - SITE=test.yml ANSIBLE_VERSION=2.0.0.1
-  - SITE=test.yml ANSIBLE_VERSION=2.0.0.0
 
   - SITE=test-geoip.yml ANSIBLE_VERSION=latest
   - SITE=test-geoip.yml ANSIBLE_VERSION=2.1.0.0
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.2.0
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.1.0
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.1
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.0
 
-matrix:
-  allow_failures:
-    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.2
-    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.1
-    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.0
-    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
-    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.1
-    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.0
+#matrix:
+#  allow_failures:
+#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.2
+#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.1
+#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.0
+#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
+#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.1
+#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.0
 
 branches:
   only:
@@ -70,12 +60,13 @@ script:
   - curl http://127.0.0.1/
 
 after_failure:
+  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
   - sudo service nginx status
   - ansible --version
   - curl http://127.0.0.1/
   - curl http://localhost/
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
-  
+
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
