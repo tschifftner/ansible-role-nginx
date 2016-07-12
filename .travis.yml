@@ -45,7 +45,9 @@ script:
 
   # Run the role/playbook with ansible-playbook.
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  - cat /etc/nginx/nginx.conf
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  - cat /etc/nginx/nginx.conf
 
   # Run the role/playbook again, checking to make sure it's idempotent.
   - >
@@ -60,13 +62,15 @@ script:
   # Check if nginx is reachable
   - curl http://127.0.0.1/
 
+  - nginx -v
+
 after_failure:
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
   - sudo service nginx status
   - ansible --version
   - curl http://127.0.0.1/
   - curl http://localhost/
-  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  - nginx -v
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
