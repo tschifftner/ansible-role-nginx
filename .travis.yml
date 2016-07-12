@@ -45,8 +45,10 @@ script:
 
   # Run the role/playbook with ansible-playbook.
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  - nginx -v
   - cat /etc/nginx/nginx.conf
   - ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+  - nginx -v
   - cat /etc/nginx/nginx.conf
 
   # Run the role/playbook again, checking to make sure it's idempotent.
