@@ -1,0 +1,35 @@
+---
+
+- name: 'Get current nginx version'
+  shell: nginx -v 2>&1 | awk -F/ '{print $2}'
+  register: nginx_current_version_output
+  changed_when: false
+  ignore_errors: true
+
+- name: Set proper nginx version
+  set_fact:
+    nginx_current_version: "{{ nginx_current_version_output.stdout | default('1.0.0') }}"
+
+- name: show version
+  debug:
+    msg: '{{ nginx_current_version }}'
+
+# Configure nginx
+- name: Make sure folders are present
+  file:
+    path: '/etc/nginx/{{ item | dirname }}'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items: "{{ nginx_default_config_files + nginx_config_files }}"
+
+- name: Copy main configurations
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx
+  with_items: "{{ nginx_default_config_files + nginx_config_files }}"
