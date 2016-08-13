@@ -1,7 +1,11 @@
+Certificate
 {{ item.certificate }}
 
+Intermediate
 {{ item.intermediate_certificate }}
 
 {% if item.intermediate_certificate2 is defined %}
+Intermediate 2
 {{ item.intermediate_certificate2 }}
 {% endif %}
+

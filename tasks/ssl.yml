@@ -11,6 +11,7 @@
   with_items: '{{nginx_ssl_certificates}}'
 
 - name: Generate trustchain.crt
+  notify: reload nginx
   no_log: true
   template:
     src: 'ssl/trustchain.crt'
@@ -19,6 +20,7 @@
   with_items: '{{nginx_ssl_certificates}}'
 
 - name: Generate certificate.key
+  notify: reload nginx
   no_log: true
   template:
     src: 'ssl/certificate.key'
@@ -27,6 +29,7 @@
   with_items: '{{nginx_ssl_certificates}}'
 
 - name: Generate certificate.crt
+  notify: reload nginx
   no_log: true
   template:
     src: 'ssl/certificate.crt'
