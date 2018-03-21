@@ -3,6 +3,20 @@ nginx_repository_urls:
   - 'deb http://nginx.org/packages/mainline/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} nginx'
   - 'deb-src http://nginx.org/packages/mainline/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} nginx'
 
+nginx_backports_repository_urls:
+  - 'deb http://ftp.debian.org/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}-backports main'
+
+nginx_use_backports: false
+nginx_add_backports_repository: false
+
+nginx_use_dotdeb: false
+
+nginx_dotdeb_apt_key: 'http://www.dotdeb.org/dotdeb.gpg'
+
+nginx_dotdeb_repository_urls:
+  - deb http://packages.dotdeb.org jessie-nginx-http2 all
+  - deb-src http://packages.dotdeb.org jessie-nginx-http2 all
+
 nginx_package: nginx-full
 nginx_package_state: 'latest'
 

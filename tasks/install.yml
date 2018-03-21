@@ -1,19 +1,42 @@
 
-- name: Add keys
-  apt_key:
-    url: 'http://nginx.org/keys/nginx_signing.key'
-    state: present
 
-- name: Add repositories
-  apt_repository:
-    repo: '{{ item }}'
-    state: present
-    filename: nginx
-  with_items: '{{ nginx_repository_urls }}'
+- name: Use dotdeb only when Debian Jessie is installed
+  set_fact:
+    nginx_use_dotdeb: false
+  when: ansible_distribution_release != 'jessie'
 
+- include: install-dotdeb.yml
+  when: nginx_use_dotdeb == true
 
-# Install nginx
-- name: Install nginx
-  apt:
-    name: '{{ nginx_package }}'
-    state: '{{ nginx_package_state }}'
+- include: install-default.yml
+  when: nginx_use_dotdeb == false
+
+#- name: Add keys
+#  apt_key:
+#    url: 'http://nginx.org/keys/nginx_signing.key'
+#    state: present
+#  when: nginx_use_backports == false
+#
+#- name: Add repositories
+#  apt_repository:
+#    repo: '{{ item }}'
+#    state: present
+#    filename: nginx
+#  with_items: '{{ nginx_repository_urls }}'
+#  when: nginx_use_backports == false
+#
+#- name: Add backports repositories
+#  apt_repository:
+#    repo: '{{ item }}'
+#    state: present
+#    filename: nginx
+#  with_items: '{{ nginx_backports_repository_urls }}'
+#  when: nginx_use_backports == true and nginx_add_backports_repository == true
+#
+#
+## Install nginx
+#- name: Install nginx
+#  apt:
+#    name: '{{ nginx_package }}'
+#    state: '{{ nginx_package_state }}'
+#    default_release: "{{ ansible_distribution_release }}{{ '-backports' if nginx_use_backports == true}}"

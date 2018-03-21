@@ -1,0 +1,44 @@
+---
+
+- name: 'Ensure debian distribution'
+  assert:
+    that: ansible_distribution == 'Debian'
+
+- name: Add backports repositories
+  apt_repository:
+    repo: '{{ item }}'
+    state: "{{ 'present' if nginx_add_backports_repository == true else 'absent'}}"
+    filename: nginx
+  with_items: '{{ nginx_backports_repository_urls }}'
+
+- name: Install openssl
+  apt:
+    name: libssl1.0.0
+    state: latest
+    default_release: jessie-backports
+    force: true
+
+- name: Install dotdeb key
+  apt_key:
+    url: '{{ nginx_dotdeb_apt_key }}'
+    state: present
+
+- name: Remove default nginx repositories
+  apt_repository:
+    repo: '{{ item }}'
+    state: absent
+    filename: nginx
+  with_items: '{{ nginx_repository_urls }}'
+
+- name: Add dotdeb repositories
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: nginx
+  with_items: '{{ nginx_dotdeb_repository_urls }}'
+
+# Install nginx
+- name: Install nginx
+  apt:
+    name: '{{ nginx_package }}'
+    state: '{{ nginx_package_state }}'

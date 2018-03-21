@@ -1,10 +1,32 @@
 ---
 # GeoIP
 
+- name: nginx geoip module is present
+  register: nginx_module_geoip_present
+  stat:
+    path: /usr/lib/nginx/modules/ngx_http_geoip_module.so
+  when: install_geoip and nginx_use_modules
+
+- name: Set fact for geoip data
+  set_fact:
+    install_geoip: false
+  when: install_geoip and nginx_use_modules and nginx_module_geoip_present.stat.exists == false
+
+- name: link geoip module
+  file:
+    src: /usr/share/nginx/modules-available/mod-http-geoip.conf
+    dest: /etc/nginx/modules-enabled/50-mod-http-geoip.conf
+    state: link
+  when: install_geoip and nginx_use_modules
+
 - name: GeoIP.dat is present
   register: nginx_geoip_present
   stat:
     path: /usr/share/GeoIP/GeoIP.dat
+
+- name: Set fact for geoip data
+  set_fact:
+    nginx_geoip_data_missing: install_geoip == true and nginx_geoip_present.stat.exists == false
 
 - name: Make sure /usr/share/GeoIP is present
   file:
@@ -13,25 +35,27 @@
     owner: '{{ nginx_owner }}'
     group: '{{ nginx_group }}'
     mode: '0755'
+  when: nginx_geoip_data_missing
 
 - name: Install unzip if missing
   apt:
     name: unzip
     state: present
+  when: nginx_geoip_data_missing
 
 - name: Download GeoIP.dat.gz
   get_url:
     url: '{{ geoip_download_url }}'
     dest: '/usr/share/GeoIP/GeoIP.dat.gz'
   register: new_archive
-  when: nginx_geoip_present.stat.exists == false
+  when: nginx_geoip_data_missing
 
 - name: Unarchiv
   command: /bin/gunzip --force /usr/share/GeoIP/GeoIP.dat.gz > /usr/share/GeoIP/GeoIP.dat
   args:
     creates: /usr/share/GeoIP/GeoIP.dat
   ignore_errors: true
-  when: nginx_geoip_present.stat.exists == false
+  when: nginx_geoip_data_missing
 
 #- name: Unarchiv
 #  unarchive:
@@ -49,7 +73,19 @@
   file:
     path: /usr/share/GeoIP/GeoIP.dat
     state: file
-  when: nginx_geoip_present.stat.exists == false
+  when: install_geoip
+
+
+
+#- name: Configure nginx to load geoip module
+#  template:
+#    src: modules/geoip.conf
+#    dest: /etc/nginx/modules-enabled/50-mod-http-geoip.conf
+#    owner: '{{ nginx_owner }}'
+#    group: '{{ nginx_group }}'
+#    mode: '0644'
+#  notify: restart nginx
+#  when: install_geoip and nginx_use_modules
 
 - name: Configure nginx
   template:
@@ -59,3 +95,13 @@
     group: '{{ nginx_group }}'
     mode: '0644'
   notify: restart nginx
+  when: install_geoip
+
+- name: Remove geoip module config when disabled
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/nginx/conf.d/geoip.conf
+    - /etc/nginx/modules-enabled/50-mod-http-geoip.conf
+  when: install_geoip == false

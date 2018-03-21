@@ -4,13 +4,34 @@
   include: install.yml
   tags: ['nginx-install']
 
+- name: 'Get current nginx version'
+  shell: nginx -v 2>&1 | awk -F/ '{print $2}'
+  register: nginx_current_version_output
+  changed_when: false
+  ignore_errors: true
+  tags: ['always']
+
+- name: Set proper nginx version
+  set_fact:
+    nginx_current_version: "{{ nginx_current_version_output.stdout | default('1.0.0') }}"
+    nginx_use_modules: "{{ nginx_current_version_output.stdout | version_compare('1.10', '>=') }}"
+  tags: ['always']
+
+- name: show version
+  debug:
+    msg: '{{ nginx_current_version }}'
+
+- name: nginx supports modules
+  debug:
+    msg: 'Nginx is newer than 1.10 and therefore supports modules'
+  when: nginx_use_modules
+
 - name: Configure nginx
   include: configure.yml
   tags: ['nginx-configure']
 
 - name: Install GeoIP
   include: geoip.yml
-  when: install_geoip
   tags: ['nginx-geoip']
 
 - name: Install ssl certificates
