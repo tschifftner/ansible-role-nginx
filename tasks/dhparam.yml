@@ -11,14 +11,23 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: '0600'
+  when: not _nginx_dhparam_file.stat.exists
+
+- name: Ensure openssl.sh helper is installed
+  copy:
+    src: openssl.sh
+    dest: /usr/local/bin/openssl.sh
+    owner: root
+    group: root
+    mode: 0655
   when: not _nginx_dhparam_file.stat.exists
 
 - name: Generate dhparam.pem
+  no_log: true
   notify: reload nginx
-  command: openssl dhparam 2048 -out {{ nginx_dhparam_file }}
+  shell: /usr/local/bin/openssl.sh "dhparam 4096 -dsaparam" "{{ nginx_dhparam_file }}"
   args:
     creates: '{{ nginx_dhparam_file }}'
-  async: 600
-  poll: 5
+  with_items: nginx_ssl_certificates
   when: not _nginx_dhparam_file.stat.exists
