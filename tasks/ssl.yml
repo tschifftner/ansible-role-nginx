@@ -51,4 +51,4 @@
   shell: /usr/local/bin/openssl.sh "dhparam 2048" "{{ item.save_path }}/dhparam.pem"
   args:
     creates: '{{ item.save_path }}/dhparam.pem'
-  with_items: nginx_ssl_certificates
+  with_items: '{{nginx_ssl_certificates}}'
