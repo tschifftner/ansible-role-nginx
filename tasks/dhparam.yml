@@ -29,5 +29,6 @@
   shell: /usr/local/bin/openssl.sh "dhparam 4096 -dsaparam" "{{ nginx_dhparam_file }}"
   args:
     creates: '{{ nginx_dhparam_file }}'
-  with_items: nginx_ssl_certificates
+  with_items: '{{nginx_ssl_certificates}}'
   when: not _nginx_dhparam_file.stat.exists
+  tags: ['skip_ansible_lint']

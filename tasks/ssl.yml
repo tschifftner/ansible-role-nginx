@@ -52,3 +52,4 @@
   args:
     creates: '{{ item.save_path }}/dhparam.pem'
   with_items: '{{nginx_ssl_certificates}}'
+  tags: ['skip_ansible_lint']
