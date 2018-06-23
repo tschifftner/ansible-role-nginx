@@ -5,6 +5,7 @@
   vars:
     nginx_remove_default_vhost: false
     install_geoip: true
+    nginx_dhparam_size: 8
 
   roles:
     - ansible-role-nginx

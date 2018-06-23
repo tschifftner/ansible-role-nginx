@@ -47,6 +47,7 @@ nginx_upstreams: []
 #      - 'localhost:8080 backup'
 
 nginx_dhparam_file: '/etc/nginx/ssl/dhparam.pem'
+nginx_dhparam_size: 4096
 
 nginx_ssl_certificates: []
 nginx_additional_templates: []
