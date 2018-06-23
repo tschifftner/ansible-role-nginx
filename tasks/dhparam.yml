@@ -8,7 +8,8 @@
     group: root
     mode: '0600'
 
-- openssl_dhparam:
+- name: Generate dhparam file
+  openssl_dhparam:
     path: '{{ nginx_dhparam_file }}'
     size: '{{ nginx_dhparam_size }}'
   notify: reload nginx
