@@ -10,4 +10,4 @@
 
 - openssl_dhparam:
     path: '{{ nginx_dhparam_file }}'
-    notify: reload nginx
+  notify: reload nginx
