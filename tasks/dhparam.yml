@@ -13,3 +13,4 @@
     path: '{{ nginx_dhparam_file }}'
     size: '{{ nginx_dhparam_size }}'
   notify: reload nginx
+  changed_when: false
