@@ -1,10 +1,5 @@
 ---
 
-- name: Check if file exists
-  stat:
-    path: '{{ nginx_dhparam_file }}'
-  register: _nginx_dhparam_file
-
 - name: Ensure directory exists
   file:
     path: '{{ nginx_dhparam_file | dirname }}'
@@ -12,23 +7,10 @@
     owner: root
     group: root
     mode: '0600'
-  when: not _nginx_dhparam_file.stat.exists
 
-- name: Ensure openssl.sh helper is installed
-  copy:
-    src: openssl.sh
-    dest: /usr/local/bin/openssl.sh
-    owner: root
-    group: root
-    mode: 0655
-  when: not _nginx_dhparam_file.stat.exists
-
-- name: Generate dhparam.pem
-  no_log: true
+- name: Generate dhparam file
+  openssl_dhparam:
+    path: '{{ nginx_dhparam_file }}'
+    size: '{{ nginx_dhparam_size }}'
   notify: reload nginx
-  shell: /usr/local/bin/openssl.sh "dhparam 4096 -dsaparam" "{{ nginx_dhparam_file }}"
-  args:
-    creates: '{{ nginx_dhparam_file }}'
-  with_items: '{{nginx_ssl_certificates}}'
-  when: not _nginx_dhparam_file.stat.exists
-  tags: ['skip_ansible_lint']
+  changed_when: false
