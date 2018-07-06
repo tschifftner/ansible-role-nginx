@@ -1,69 +1,60 @@
 ---
-sudo: required
-dist: trusty
-
-language: python
-python: "2.7"
+services: docker
 
 env:
-  - SITE=test.yml ANSIBLE_VERSION=latest
-  - SITE=test.yml ANSIBLE_VERSION=2.5.0.0
+#  - distro: centos7
+#  - distro: centos6
+#  - distro: fedora27
+#  - distro: ubuntu1604
+#  - distro: ubuntu1404
+#  - distro: ubuntu1204
 
-  - SITE=test-geoip.yml ANSIBLE_VERSION=latest
-  - SITE=test-geoip.yml ANSIBLE_VERSION=2.5.0.0
+  - distro: debian9
+  - distro: debian8
+  - distro: ubuntu1804
+  - distro: ubuntu1604
+  - distro: ubuntu1404
 
-#matrix:
-#  allow_failures:
-#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.2
-#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.1
-#    - env: SITE=test.yml ANSIBLE_VERSION=2.0.0.0
-#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.2
-#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.1
-#    - env: SITE=test-geoip.yml ANSIBLE_VERSION=2.0.0.0
-
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y curl
-
-install:
-  # Install Ansible.
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install --no-binary ansible ansible; else pip install --no-binary ansible ansible==$ANSIBLE_VERSION; fi
-
-  # Add ansible.cfg to pick up roles path.
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
-
-  # Install ansible-lint
-  - pip install ansible-lint
+  - distro: debian9
+    playbook: test-geoip.yml
+  - distro: debian8
+    playbook: test-geoip.yml
+  - distro: ubuntu1804
+    playbook: test-geoip.yml
+  - distro: ubuntu1604
+    playbook: test-geoip.yml
+  - distro: ubuntu1404
+    playbook: test-geoip.yml
 
 script:
-  # Check the role/playbook's syntax.
-  - ansible-playbook -i tests/inventory tests/test.yml --syntax-check
+  # Configure test script so we can run extra tests after playbook is run.
+  - export container_id=$(date +%s)
+  - export cleanup=false
 
-  # Run the role/playbook with ansible-playbook.
-  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --become
+  # Download test shim.
+  - wget -O ${PWD}/tests/test.sh https://gist.githubusercontent.com/tschifftner/4078cf2a8429d967d5e100649ff2caa9/raw/
+  - chmod +x ${PWD}/tests/test.sh
 
-  # Run the role/playbook again, checking to make sure it's idempotent.
-  - >
-    ansible-playbook -i tests/inventory tests/$SITE --connection=local --become
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
+  # Run tests.
+  - ${PWD}/tests/test.sh
 
-  # ansible-lint checks for best practice
-  - ansible-lint tests/$SITE
+  # Ensure PHP is installed.
+  - 'docker exec --tty ${container_id} env TERM=xterm which nginx'
+  - 'docker exec --tty ${container_id} env TERM=xterm nginx -v'
+  - 'docker exec --tty ${container_id} env TERM=xterm test -x /usr/sbin/nginx'
+  - 'docker exec --tty ${container_id} env TERM=xterm curl http://127.0.0.1/ | grep "Welcome to nginx"'
 
-  # Check if nginx is reachable
-  - curl http://127.0.0.1/
+  - |
+    if [ "${playbook:-''}" == "test-geoip.yml" ]; then
+      docker exec --tty ${container_id} env TERM=xterm nginx -V 2>&1 | tr -- - '\n' | grep http_geoip_module
+    fi
 
-  - nginx -v
 
 after_failure:
-  - ansible-playbook -i tests/inventory tests/$SITE --connection=local --become
-  - sudo service nginx status
-  - ansible --version
-  - curl http://127.0.0.1/
-  - curl http://localhost/
-  - nginx -v
+  - docker exec --tty ${container_id} env TERM=xterm nginx -v
+  - docker exec --tty ${container_id} env TERM=xterm curl http://127.0.0.1/
+  - docker exec --tty ${container_id} env TERM=xterm service nginx status
+  - docker exec --tty ${container_id} env TERM=xterm ansible --version
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6

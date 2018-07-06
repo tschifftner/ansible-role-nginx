@@ -7,5 +7,14 @@
     install_geoip: true
     nginx_dhparam_size: 8
 
+  pre_tasks:
+    - name: Install gpg
+      apt:
+        pkg: '{{ item }}'
+        state: present
+      with_items:
+        - gpg
+        - curl
+
   roles:
-    - ansible-role-nginx
+    - role_under_test
