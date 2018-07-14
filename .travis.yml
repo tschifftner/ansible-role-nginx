@@ -30,6 +30,7 @@ script:
   # Configure test script so we can run extra tests after playbook is run.
   - export container_id=$(date +%s)
   - export cleanup=false
+  - export DOCKER="docker exec --tty ${container_id} env TERM=xterm"
 
   # Download test shim.
   - wget -O ${PWD}/tests/test.sh https://gist.githubusercontent.com/tschifftner/4078cf2a8429d967d5e100649ff2caa9/raw/
@@ -39,22 +40,22 @@ script:
   - ${PWD}/tests/test.sh
 
   # Ensure PHP is installed.
-  - 'docker exec --tty ${container_id} env TERM=xterm which nginx'
-  - 'docker exec --tty ${container_id} env TERM=xterm nginx -v'
-  - 'docker exec --tty ${container_id} env TERM=xterm test -x /usr/sbin/nginx'
-  - 'docker exec --tty ${container_id} env TERM=xterm curl http://127.0.0.1/ | grep "Welcome to nginx"'
+  - ${DOCKER} which nginx
+  - ${DOCKER} nginx -v
+  - ${DOCKER} test -x /usr/sbin/nginx
+  - ${DOCKER} curl http://127.0.0.1/ | grep "Welcome to nginx"
 
   - |
     if [ "${playbook:-''}" == "test-geoip.yml" ]; then
-      docker exec --tty ${container_id} env TERM=xterm nginx -V 2>&1 | tr -- - '\n' | grep http_geoip_module
+      ${DOCKER} nginx -V 2>&1 | tr -- - '\n' | grep http_geoip_module
     fi
 
 
 after_failure:
-  - docker exec --tty ${container_id} env TERM=xterm nginx -v
-  - docker exec --tty ${container_id} env TERM=xterm curl http://127.0.0.1/
-  - docker exec --tty ${container_id} env TERM=xterm service nginx status
-  - docker exec --tty ${container_id} env TERM=xterm ansible --version
+  - ${DOCKER} nginx -v
+  - ${DOCKER} curl http://127.0.0.1/
+  - ${DOCKER} service nginx status
+  - ${DOCKER} ansible --version
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
