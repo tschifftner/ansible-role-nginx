@@ -13,7 +13,6 @@ env:
   - distro: debian8
   - distro: ubuntu1804
   - distro: ubuntu1604
-  - distro: ubuntu1404
 
   - distro: debian9
     playbook: test-geoip.yml
@@ -22,8 +21,6 @@ env:
   - distro: ubuntu1804
     playbook: test-geoip.yml
   - distro: ubuntu1604
-    playbook: test-geoip.yml
-  - distro: ubuntu1404
     playbook: test-geoip.yml
 
 script:

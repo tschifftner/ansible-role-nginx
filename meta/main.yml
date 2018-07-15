@@ -14,7 +14,6 @@ galaxy_info:
     - 9 (Stretch)
   - name: Ubuntu
     versions:
-    - 14.04 (Trusty Tahr)
     - 16.04 (Xenial Xerus)
     - 18.04 (Bionic Beaver)
   galaxy_tags:
