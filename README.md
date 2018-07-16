@@ -1,6 +1,6 @@
 # Ansible Role: Nginx
 
-[![Build Status](https://travis-ci.org/tschifftner/ansible-role-nginx.svg)](https://travis-ci.org/tschifftner/ansible-role-nginx)
+[![Build Status](https://travis-ci.org/tschifftner/ansible-role-nginx.svg?branch=master)](https://travis-ci.org/tschifftner/ansible-role-nginx)
 
 Installs nginx on Debian/Ubuntu linux servers.
 
