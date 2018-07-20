@@ -1,0 +1,15 @@
+---
+
+- name: Install gpg
+  apt:
+    pkg: 'gpg'
+  when: >
+    (ansible_distribution == 'Debian' and ansible_distribution_version|int >= 9) or
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_version|int >= '18.04')
+
+- name: Install gnupg
+  apt:
+    pkg: 'gnupg'
+  when: >
+    (ansible_distribution == 'Debian' and ansible_distribution_version|int <= 8) or
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_version|int <= '16.04')
