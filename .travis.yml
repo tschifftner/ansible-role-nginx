@@ -42,6 +42,10 @@ script:
   - ${DOCKER} test -x /usr/sbin/nginx
   - ${DOCKER} curl http://127.0.0.1/ | grep "Welcome to nginx"
 
+  # Ensure nginx is started
+  - ${DOCKER} systemctl --no-pager status nginx | grep 'nginx.service; enabled'
+  - ${DOCKER} systemctl --no-pager status nginx | grep 'running'
+
   - |
     if [ "${playbook:-''}" == "test-geoip.yml" ]; then
       ${DOCKER} nginx -V 2>&1 | tr -- - '\n' | grep http_geoip_module
